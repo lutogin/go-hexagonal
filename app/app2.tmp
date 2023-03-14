@@ -1,0 +1,21 @@
+package app
+
+import (
+	"fmt"
+	"go-crud/src/customers"
+	"log"
+	"net/http"
+)
+
+func mainPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Main page.")
+}
+
+func Start() {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/customers/all", customers.GetAllCustomers)
+	mux.HandleFunc("/", mainPage)
+
+	log.Fatal(http.ListenAndServe(":8181", mux))
+}
