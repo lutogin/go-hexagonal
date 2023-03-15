@@ -1,27 +1,27 @@
 package app
 
 import (
-	"fmt"
-	"go-crud/src/api"
-	"go-crud/src/customers"
+	"go-crud/domain/api"
+	domain "go-crud/domain/customer"
+	handler "go-crud/handler/customer"
+	service "go-crud/service/customer"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-func mainPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Server is running...")
-}
-
 func Start() {
-	rounter := mux.NewRouter()
+	router := mux.NewRouter()
 
-	rounter.HandleFunc("/customers", customers.GetAllCustomers).Methods(http.MethodGet)
-	rounter.HandleFunc("/customers/{id:[0-9]+}", customers.GetCustomer).Methods(http.MethodGet)
-	rounter.HandleFunc("/customers", customers.CreateCustomer).Methods(http.MethodPost)
-	rounter.HandleFunc("/api/time", api.ApiTime).Methods(http.MethodGet)
-	rounter.HandleFunc("/", mainPage).Methods(http.MethodGet)
+	// wiring
+	ch := handler.CustomerHandlers{Service: service.NewCustomerService(domain.NewCustomerRepositoryStub())}
 
-	log.Fatal(http.ListenAndServe(":8181", rounter))
+	router.HandleFunc("/customers", ch.GetAllCustomers).Methods(http.MethodGet)
+	router.HandleFunc("/api/time", api.ApiTime).Methods(http.MethodGet)
+	//router.HandleFunc("/customers/{id:[0-9]+}", customer.GetCustomer).Methods(http.MethodGet)
+	//router.HandleFunc("/customers", customer.CreateCustomer).Methods(http.MethodPost)
+	//router.HandleFunc("/", mainPage).Methods(http.MethodGet)
+
+	log.Fatal(http.ListenAndServe(":8181", router))
 }
